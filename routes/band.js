@@ -40,7 +40,7 @@ router.post('/', (req,response) => {
                 console.log(err.stack)
             } else {
                 console.log(res.rows[0])
-                response.send(JSON.stringify({res:'USER:POST Received'}));
+                response.send(JSON.stringify({res:'BAND:POST Received'}));
             }
         })
     }
@@ -57,17 +57,27 @@ router.put('/', (req,res) => {
 })
 
 // curl -X DELETE -H "Content-Type: application/json" -d '{"id":"3333"}' http://localhost:3000/user
-router.delete('/', (req,res) => {
-    var requestId = req.body.id;
-    console.log(users.length)
-    for(i = 0; i < users.length; i++)
+router.delete('/:id', (req,response) => {
+    const requestId = parseInt((req.params.id).replace(':', ''));
+    console.log("GOT: " + requestId);
+
+    if(requestId)
     {
-        if (users[i].id == requestId) {
-            users.splice(i,1);
-            break;
-        }
+        pgQuery = 'DELETE FROM band WHERE band_id =  $1';
+        pgValue =  [requestId];
+
+        pool.query(pgQuery, pgValue, (err, res) => {
+            if (err) {
+                console.log(err.stack)
+            } else {
+                response.send(JSON.stringify({res:'BAND: DELETE Received'}));
+            }
+        })
     }
-    res.send('USER:DELETE Received');
+    else
+    {
+        console.log("DELETE: Wrong DATA");
+    }
     // res.end(JSON.stringify(users, null, 3));
 })
 
