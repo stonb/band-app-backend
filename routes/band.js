@@ -20,6 +20,28 @@ router.get('/', (req,res) => {
     })
 })
 
+router.get('/:id', (req,res) => {
+    const requestId = parseInt((req.params.id).replace(':', ''));
+    console.log("GOT ID: " + requestId);
+
+    if (requestId)
+    {
+        pgQuery = 'SELECT * FROM band WHERE band_id =  $1';
+        pgValue =  [requestId];
+
+        pool.query(pgQuery, pgValue, (error, results) => {
+            if (error) {
+                throw error
+            }
+            console.log(results.rows[0]);
+            res.status(200).json(results.rows[0]);
+        })
+    }
+    else
+    {
+        console.log("GET ONE: Wrong DATA");
+    }    
+})
 
 router.post('/', (req,response) => {
     
@@ -46,7 +68,7 @@ router.post('/', (req,response) => {
     }
     else
     {
-        console.log("Wrong DATA");
+        console.log("POST: Wrong DATA");
     }
 })
 
